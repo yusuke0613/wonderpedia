@@ -3,7 +3,6 @@
 import "regenerator-runtime/runtime";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
@@ -28,7 +27,7 @@ export default function CreatePage() {
   const [speechSupported, setSpeechSupported] = useState(false);
 
   // Web Speech API用の参照
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
 
   // Web Speech APIのサポート確認とセットアップ
   useEffect(() => {
