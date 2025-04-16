@@ -1,208 +1,273 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { BookOpen, Clock, Heart, Magnet as Magic, Plus, Search, Settings, Sparkles, Star, User } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Star,
+  BookOpen,
+  Plus,
+  Settings,
+  LogOut,
+  Sparkles,
+  LineChart,
+} from "lucide-react";
 import Link from "next/link";
 
-// ダミーデータ
-const RECENT_STORIES = [
-  {
-    id: 1,
-    title: "どうして空は青いの？",
-    date: "2024-03-15",
-    image: "https://images.unsplash.com/photo-1597571063304-81f081944ee8?w=300&h=200&fit=crop",
-    likes: 24
-  },
-  {
-    id: 2,
-    title: "恐竜はなぜ絶滅したの？",
-    date: "2024-03-10",
-    image: "https://images.unsplash.com/photo-1601459427108-47e20d579a35?w=300&h=200&fit=crop",
-    likes: 18
-  },
-  {
-    id: 3,
-    title: "雨はどうして降るの？",
-    date: "2024-03-05",
-    image: "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?w=300&h=200&fit=crop",
-    likes: 15
-  }
-];
+interface ChildInfo {
+  name: string;
+  birthDate: string;
+  gender: string;
+  interests: string[];
+  favoriteColor: string;
+  region: string;
+}
 
-const FAVORITE_STORIES = [
-  {
-    id: 4,
-    title: "月はなぜ光るの？",
-    date: "2024-02-28",
-    image: "https://images.unsplash.com/photo-1532693322450-2cb5c511067d?w=300&h=200&fit=crop",
-    likes: 32
-  },
-  {
-    id: 5,
-    title: "虹はどうしてできるの？",
-    date: "2024-02-20",
-    image: "https://images.unsplash.com/photo-1507358522600-9f71e620c44e?w=300&h=200&fit=crop",
-    likes: 27
-  }
-];
-
-const RECOMMENDED_TOPICS = [
-  "宇宙のふしぎ",
-  "動物のくらし",
-  "地球のしくみ",
-  "植物の成長",
-  "科学実験",
-  "歴史の出来事"
-];
+const interestLabels: { [key: string]: string } = {
+  animals: "動物",
+  vehicles: "のりもの",
+  nature: "自然",
+  sports: "スポーツ",
+  art: "創作",
+  music: "音楽",
+  food: "食べ物",
+  heroes: "ヒーロー",
+  dinosaurs: "恐竜",
+  fairytales: "おとぎ話",
+};
 
 export default function DashboardPage() {
+  const [childInfo, setChildInfo] = useState<ChildInfo | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const email = localStorage.getItem("userEmail");
+      const storedInfo = localStorage.getItem("childInfo");
+
+      if (!email || email !== "test@test.com") {
+        router.push("/auth/login");
+        return;
+      }
+
+      if (!storedInfo) {
+        router.push("/auth/child-info");
+        return;
+      }
+
+      setChildInfo(JSON.parse(storedInfo));
+      setIsLoading(false);
+    };
+
+    checkAuth();
+  }, [router]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("childInfo");
+    router.push("/");
+  };
+
+  if (isLoading || !childInfo) return null;
+
+  const age = childInfo.birthDate
+    ? Math.floor(
+        (new Date().getTime() - new Date(childInfo.birthDate).getTime()) /
+          (1000 * 60 * 60 * 24 * 365.25)
+      )
+    : null;
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary/5 via-secondary/5 to-accent/5">
-      {/* ヘッダー */}
-      <header className="fixed top-0 w-full bg-background/80 backdrop-blur-sm border-b z-50">
-        <div className="container mx-auto px-4 h-20 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="relative">
-              <Star className="h-8 w-8 text-primary floating" />
-              <Magic className="h-6 w-6 text-accent absolute -bottom-2 -right-2 floating" style={{ animationDelay: '1s' }} />
-            </div>
+    <div className="min-h-screen gradient-bg">
+      <header className="container mx-auto px-4 py-6">
+        <div className="flex justify-between items-center">
+          <div className="text-2xl font-bold text-primary flex items-center gap-2">
+            <Star className="w-8 h-8" />
             <span className="text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-              ストーリーマジック
+              Wonderpedia
             </span>
           </div>
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <Search className="h-5 w-5" />
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              onClick={() => router.push("/settings")}
+            >
+              <Settings className="w-5 h-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <Settings className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <User className="h-5 w-5" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              onClick={handleLogout}
+            >
+              <LogOut className="w-5 h-5" />
             </Button>
           </div>
         </div>
       </header>
 
-      {/* メインコンテンツ */}
-      <main className="container mx-auto px-4 pt-32 pb-16">
-        {/* ウェルカムセクション */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">
-            おかえりなさい、<span className="text-primary">ゆうき</span>さん！
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            今日はどんなおはなしを作りましょうか？
-          </p>
-        </div>
+      <main className="container mx-auto px-4 py-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-8"
+        >
+          <Card className="bg-white/80 backdrop-blur-sm rounded-3xl border-none shadow-xl">
+            <CardHeader>
+              <CardTitle className="text-2xl">
+                {childInfo.name}のページ
+                {age !== null && (
+                  <span className="text-lg text-muted-foreground ml-2">
+                    ({age}歳)
+                  </span>
+                )}
+              </CardTitle>
+              <CardDescription>
+                好きなもの：
+                {childInfo.interests
+                  .map((interest) => interestLabels[interest])
+                  .join("、")}
+              </CardDescription>
+            </CardHeader>
+          </Card>
 
-        {/* 新しい物語を作るセクション */}
-        <Card className="p-8 mb-12 bubble bg-gradient-to-r from-primary/10 to-secondary/10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="text-center md:text-left">
-              <h2 className="text-2xl font-bold mb-4">新しい物語を作る</h2>
-              <p className="text-muted-foreground mb-6">
-                お子様の興味や疑問から、世界でたった一つの絵本を作りましょう
-              </p>
-              <Button size="lg" className="rounded-full bg-gradient-to-r from-primary to-secondary hover:opacity-90" asChild>
-                <Link href="/create">
-                  <Sparkles className="mr-2 h-5 w-5" />
-                  おはなしを作る
-                </Link>
-              </Button>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {RECOMMENDED_TOPICS.slice(0, 6).map((topic, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  className="rounded-full hover:bg-primary/10"
-                >
-                  {topic}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </Card>
+          <div className="grid md:grid-cols-2 gap-6">
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              className="group cursor-pointer"
+              onClick={() => router.push("/create-book")}
+            >
+              <Card className="bg-primary/10 backdrop-blur-sm rounded-3xl border-none shadow-xl h-full transition-colors group-hover:bg-primary/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Plus className="w-6 h-6" />
+                    新しい絵本を作る
+                  </CardTitle>
+                  <CardDescription>
+                    お子様の「なぜ？」から素敵な絵本を作りましょう
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex justify-center">
+                    <Sparkles className="w-20 h-20 text-primary opacity-50" />
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
 
-        {/* 最近作った物語 */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-              <Clock className="h-6 w-6 text-primary" />
-              最近作った物語
-            </h2>
-            <Button variant="ghost" className="rounded-full">
-              すべて見る
-              <Plus className="ml-2 h-4 w-4" />
-            </Button>
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              className="group cursor-pointer"
+              onClick={() => router.push("/my-books")}
+            >
+              <Card className="bg-white/80 backdrop-blur-sm rounded-3xl border-none shadow-xl h-full">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BookOpen className="w-6 h-6" />
+                    作った絵本を見る
+                  </CardTitle>
+                  <CardDescription>
+                    これまでに作成した絵本の一覧
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center text-muted-foreground">
+                    まだ絵本がありません
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {RECENT_STORIES.map((story) => (
-              <Card key={story.id} className="overflow-hidden bubble group cursor-pointer">
-                <div className="relative aspect-[3/2]">
-                  <img
-                    src={story.image}
-                    alt={story.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-6">
-                    <div className="text-white">
-                      <h3 className="text-xl font-bold mb-2">{story.title}</h3>
-                      <div className="flex items-center justify-between">
-                        <span className="text-white/80">{story.date}</span>
-                        <div className="flex items-center">
-                          <Heart className="h-4 w-4 mr-1" />
-                          <span>{story.likes}</span>
-                        </div>
-                      </div>
-                    </div>
+
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="cursor-pointer"
+            onClick={() => router.push("/analytics")}
+          >
+            <Card className="bg-white/80 backdrop-blur-sm rounded-3xl border-none shadow-xl">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <LineChart className="w-6 h-6" />
+                  分析レポート
+                </CardTitle>
+                <CardDescription>
+                  お子様の興味・関心の分析と成長記録
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="grid md:grid-cols-3 gap-4">
+                <div className="bg-accent/20 rounded-xl p-4">
+                  <div className="font-medium mb-1">今月の傾向</div>
+                  <div className="text-sm text-muted-foreground">
+                    自然現象への興味が高まっています
                   </div>
                 </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        {/* お気に入りの物語 */}
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-              <Heart className="h-6 w-6 text-primary" />
-              お気に入りの物語
-            </h2>
-            <Button variant="ghost" className="rounded-full">
-              すべて見る
-              <Plus className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {FAVORITE_STORIES.map((story) => (
-              <Card key={story.id} className="overflow-hidden bubble group cursor-pointer">
-                <div className="relative aspect-[3/2]">
-                  <img
-                    src={story.image}
-                    alt={story.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-6">
-                    <div className="text-white">
-                      <h3 className="text-xl font-bold mb-2">{story.title}</h3>
-                      <div className="flex items-center justify-between">
-                        <span className="text-white/80">{story.date}</span>
-                        <div className="flex items-center">
-                          <Heart className="h-4 w-4 mr-1 fill-current" />
-                          <span>{story.likes}</span>
-                        </div>
-                      </div>
-                    </div>
+                <div className="bg-secondary/20 rounded-xl p-4">
+                  <div className="font-medium mb-1">おすすめスポット</div>
+                  <div className="text-sm text-muted-foreground">
+                    科学館や動物園がおすすめです
                   </div>
                 </div>
-              </Card>
+                <div className="bg-primary/20 rounded-xl p-4">
+                  <div className="font-medium mb-1">成長の記録</div>
+                  <div className="text-sm text-muted-foreground">
+                    質問が具体的になってきました
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                title: "今日のおすすめ",
+                description: "「なぜ空は青いの？」について考えてみよう！",
+                image:
+                  "https://images.unsplash.com/photo-1601297183305-6df142704ea2?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+              },
+              {
+                title: "人気のテーマ",
+                description: "みんなが気になっている「なぜ？」を見てみよう",
+                image:
+                  "https://images.unsplash.com/photo-1532693322450-2cb5c511067d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+              },
+              {
+                title: "新機能",
+                description: "音声読み上げ機能が追加されました！",
+                image:
+                  "https://images.unsplash.com/photo-1507919909716-c8262e491cde?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+              },
+            ].map((card, i) => (
+              <motion.div
+                key={i}
+                whileHover={{ scale: 1.02 }}
+                className="cursor-pointer"
+              >
+                <Card className="bg-white/80 backdrop-blur-sm rounded-3xl border-none shadow-xl overflow-hidden">
+                  <div
+                    className="h-32 bg-cover bg-center"
+                    style={{ backgroundImage: `url(${card.image})` }}
+                  />
+                  <CardHeader>
+                    <CardTitle className="text-lg">{card.title}</CardTitle>
+                    <CardDescription>{card.description}</CardDescription>
+                  </CardHeader>
+                </Card>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </main>
     </div>
   );

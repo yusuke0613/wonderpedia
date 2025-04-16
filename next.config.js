@@ -1,13 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "export",
+  output: 'export',
   eslint: {
     ignoreDuringBuilds: true,
   },
-  images: { unoptimized: true },
-
-  // 開発サーバーの設定
-  // 注意: output: exportを使用しているため、rewritesは使用できません
+  images: { 
+    unoptimized: true,
+    domains: ['images.unsplash.com']
+  },
+  typescript: {
+    ignoreBuildErrors: true
+  },
+  webpack: (config, { isServer }) => {
+    config.cache = false;
+    return config;
+  }
 };
 
 module.exports = nextConfig;

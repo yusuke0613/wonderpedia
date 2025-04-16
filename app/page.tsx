@@ -1,227 +1,205 @@
+"use client";
+
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import {
-  BookOpen,
-  Cloud,
-  Heart,
-  Magnet as Magic,
-  Moon,
-  Palette,
-  Sparkles,
-  Star,
-  Sun,
-  Users,
-} from "lucide-react";
+import { BookOpen, Sparkles, MessageCircle, Star } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary/5 via-secondary/5 to-accent/5">
-      {/* Header */}
-      <header className="fixed top-0 w-full bg-background/80 backdrop-blur-sm border-b z-50">
-        <div className="container mx-auto px-4 h-20 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="relative">
-              <Star className="h-8 w-8 text-primary floating" />
-              <Magic
-                className="h-6 w-6 text-accent absolute -bottom-2 -right-2 floating"
-                style={{ animationDelay: "1s" }}
-              />
-            </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-              Wonderpedia
-            </span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="lg" className="rounded-full" asChild>
-              <Link href="/login">ログイン</Link>
-            </Button>
+    <div className="min-h-screen gradient-bg">
+      <header className="container mx-auto px-4 py-6 flex justify-between items-center">
+        <div className="text-2xl font-bold text-primary flex items-center gap-2">
+          <Star className="w-8 h-8" />
+          <span className="text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+            Wonderpedia
+          </span>
+        </div>
+        <div className="space-x-4">
+          <Link href="/auth/login">
             <Button
-              size="lg"
-              className="rounded-full bg-gradient-to-r from-primary to-secondary hover:opacity-90"
-              asChild
+              variant="ghost"
+              className="rounded-full text-lg hover:bg-white/20"
             >
-              <Link href="/register">はじめる</Link>
+              ログイン
             </Button>
-          </div>
+          </Link>
+          <Link href="/auth/register">
+            <Button className="rounded-full text-lg bg-primary hover:bg-primary/90">
+              新規登録
+            </Button>
+          </Link>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-20">
-        <div className="container mx-auto px-4 text-center">
-          <div className="relative inline-block mb-8">
-            <Cloud className="h-16 w-16 text-secondary floating" />
-            <Star
-              className="h-8 w-8 text-accent absolute top-0 right-0 floating"
-              style={{ animationDelay: "0.5s" }}
-            />
-            <Moon
-              className="h-8 w-8 text-primary absolute bottom-0 left-0 floating"
-              style={{ animationDelay: "1s" }}
-            />
-          </div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+      <main>
+        <section className="container mx-auto px-4 py-20 text-center">
+          <motion.h1
+            className="text-4xl md:text-6xl font-bold mb-6 leading-tight"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
             お子様だけの
             <br />
-            特別なおはなしを作ろう
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            AIがお子様の興味や年齢に合わせて、世界でたった一つの絵本を作ります
-          </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Button
-              size="lg"
-              className="rounded-full text-lg bg-gradient-to-r from-primary to-secondary hover:opacity-90 h-16"
-              asChild
-            >
-              <Link href="/create">
-                <Sparkles className="mr-2 h-6 w-6" />
-                おはなしを作る
-              </Link>
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="rounded-full text-lg h-16"
-              asChild
-            >
-              <Link href="/examples">
-                <Palette className="mr-2 h-6 w-6" />
-                デモを見る
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Wonderpediaの特徴
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <div key={index} className="bubble p-8 text-center group">
-                <div className="mb-6 relative inline-block">
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-full blur-lg opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                  <feature.icon className="h-16 w-16 relative text-primary transition-transform group-hover:scale-110" />
-                </div>
-                <h3 className="text-xl font-semibold mb-4">{feature.title}</h3>
-                <p className="text-muted-foreground">{feature.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10"></div>
-        <div className="container mx-auto px-4 text-center relative">
-          <Heart className="h-16 w-16 text-primary mx-auto mb-8 floating" />
-          <h2 className="text-3xl font-bold mb-6">魔法の物語を始めましょう</h2>
-          <p className="text-xl mb-8 opacity-90">
-            たくさんの家族が素敵な思い出を作っています
-          </p>
-          <Button
-            size="lg"
-            className="rounded-full text-lg bg-gradient-to-r from-primary to-secondary hover:opacity-90 h-16"
-            asChild
+            <span className="text-primary">特別なおはなし</span>を作ろう
+          </motion.h1>
+          <motion.p
+            className="text-xl mb-12 text-muted-foreground"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
           >
-            <Link href="/register">
-              <Star className="mr-2 h-6 w-6" />
-              無料で試してみる
+            AIがお子様の興味や年齢に合わせて、世界でたった一つの絵本を作ります
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+          >
+            <Link href="/auth/register">
+              <Button
+                size="lg"
+                className="rounded-full text-lg px-8 bg-primary hover:bg-primary/90 shadow-lg"
+              >
+                さっそく絵本をつくってみる
+              </Button>
             </Link>
-          </Button>
-        </div>
-      </section>
+          </motion.div>
+        </section>
 
-      {/* Footer */}
-      <footer className="border-t py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <Star className="h-8 w-8 text-primary" />
-                <span className="text-xl font-bold">Wonderpedia</span>
+        <section className="container mx-auto px-4 py-16">
+          <h2 className="text-3xl font-bold text-center mb-12">特徴</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <motion.div
+              className="bg-white/80 backdrop-blur-sm p-8 rounded-3xl text-center shadow-xl"
+              whileHover={{ y: -5, scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <BookOpen className="w-10 h-10 text-primary" />
               </div>
-              <p className="text-muted-foreground">
-                次世代のための魔法のような物語を
+              <h3 className="text-2xl font-bold mb-4">パーソナライズ絵本</h3>
+              <p className="text-lg text-muted-foreground">
+                お子様の名前や好きなものが物語に登場します
               </p>
-            </div>
-            {footerLinks.map((section, index) => (
-              <div key={index}>
-                <h3 className="font-semibold mb-4">{section.title}</h3>
-                <ul className="space-y-2">
-                  {section.links.map((link, linkIndex) => (
-                    <li key={linkIndex}>
-                      <Link
-                        href={link.href}
-                        className="text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+            </motion.div>
+
+            <motion.div
+              className="bg-white/80 backdrop-blur-sm p-8 rounded-3xl text-center shadow-xl"
+              whileHover={{ y: -5, scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <div className="w-20 h-20 bg-secondary/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Sparkles className="w-10 h-10 text-secondary-foreground" />
               </div>
+              <h3 className="text-2xl font-bold mb-4">かんたん作成</h3>
+              <p className="text-lg text-muted-foreground">
+                質問に答えるだけで素敵な絵本が完成します
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="bg-white/80 backdrop-blur-sm p-8 rounded-3xl text-center shadow-xl"
+              whileHover={{ y: -5, scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <div className="w-20 h-20 bg-accent/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                <MessageCircle className="w-10 h-10 text-accent-foreground" />
+              </div>
+              <h3 className="text-2xl font-bold mb-4">読み上げ機能</h3>
+              <p className="text-lg text-muted-foreground">
+                優しい声で絵本を読み聞かせてくれます
+              </p>
+            </motion.div>
+          </div>
+        </section>
+
+        <section className="container mx-auto px-4 py-16">
+          <h2 className="text-3xl font-bold text-center mb-12">サンプル絵本</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                id: "1",
+                title: "どうして空は青いの？",
+                description: "空の色の不思議を楽しく学べる絵本です",
+                image:
+                  "https://images.unsplash.com/photo-1601297183305-6df142704ea2?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+              },
+              {
+                id: "2",
+                title: "お月様はどこへ行くの？",
+                description: "月の満ち欠けのふしぎなお話",
+                image:
+                  "https://images.unsplash.com/photo-1532693322450-2cb5c511067d?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+              },
+              {
+                id: "3",
+                title: "虹はどうして出るの？",
+                description: "雨上がりの空に浮かぶ虹の秘密",
+                image:
+                  "https://images.unsplash.com/photo-1507919909716-c8262e491cde?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+              },
+            ].map((book) => (
+              <motion.div
+                key={book.id}
+                className="bg-white/80 backdrop-blur-sm rounded-3xl overflow-hidden shadow-xl cursor-pointer"
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                onClick={() => {
+                  localStorage.setItem("userEmail", "test@test.com");
+                  localStorage.setItem(
+                    "childInfo",
+                    JSON.stringify({
+                      name: "テスト",
+                      birthDate: "2020-01-01",
+                      gender: "not_specified",
+                      interests: ["nature"],
+                      favoriteColor: "blue",
+                      region: "東京都",
+                    })
+                  );
+                  router.push(`/books/${book.id}`);
+                }}
+              >
+                <div
+                  className="aspect-[4/3] bg-cover bg-center"
+                  style={{ backgroundImage: `url(${book.image})` }}
+                />
+                <div className="p-6">
+                  <h3 className="text-xl font-bold mb-2">{book.title}</h3>
+                  <p className="text-muted-foreground">{book.description}</p>
+                </div>
+              </motion.div>
             ))}
           </div>
-          <div className="mt-8 pt-8 border-t text-center text-muted-foreground">
-            <p>© 2024 Wonderpedia. All rights reserved.</p>
+        </section>
+      </main>
+
+      <footer className="bg-white/50 backdrop-blur-sm mt-20 py-12">
+        <div className="container mx-auto px-4 text-center">
+          <div className="space-x-8 mb-6">
+            <a
+              href="#"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              利用規約
+            </a>
+            <a
+              href="#"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              プライバシーポリシー
+            </a>
           </div>
+          <p className="text-muted-foreground">
+            &copy; 2024 Wonderpedia All rights reserved.
+          </p>
         </div>
       </footer>
     </div>
   );
 }
-
-const features = [
-  {
-    icon: Magic,
-    title: "AIがつくる世界に一つの物語",
-    description:
-      "お子様の興味や年齢に合わせて、オリジナルのストーリーを生成します",
-  },
-  {
-    icon: Users,
-    title: "お子様ごとのプロフィール",
-    description: "複数のお子様の好みや進捗を個別に管理できます",
-  },
-  {
-    icon: Sparkles,
-    title: "インタラクティブな読書体験",
-    description: "音声や効果音、タッチ反応で物語をより楽しく体験できます",
-  },
-];
-
-const footerLinks = [
-  {
-    title: "サービス",
-    links: [
-      { label: "機能紹介", href: "/features" },
-      { label: "料金プラン", href: "/pricing" },
-      { label: "テンプレート", href: "/templates" },
-      { label: "作品例", href: "/examples" },
-    ],
-  },
-  {
-    title: "サポート",
-    links: [
-      { label: "ヘルプセンター", href: "/help" },
-      { label: "ブログ", href: "/blog" },
-      { label: "チュートリアル", href: "/tutorials" },
-      { label: "お問い合わせ", href: "/contact" },
-    ],
-  },
-  {
-    title: "規約",
-    links: [
-      { label: "プライバシー", href: "/privacy" },
-      { label: "利用規約", href: "/terms" },
-      { label: "セキュリティ", href: "/security" },
-      { label: "特定商取引法", href: "/legal" },
-    ],
-  },
-];
