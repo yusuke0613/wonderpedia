@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { Progress } from "@/components/ui/fixed/progress";
 import { Sparkles, BookOpen, Palette, Wand2 } from "lucide-react";
 
 const loadingSteps = [
@@ -40,7 +40,10 @@ interface LoadingScreenProps {
   onComplete: () => void;
 }
 
-export default function LoadingScreen({ childName, onComplete }: LoadingScreenProps) {
+export default function LoadingScreen({
+  childName,
+  onComplete,
+}: LoadingScreenProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const [currentFact, setCurrentFact] = useState(0);
@@ -55,7 +58,7 @@ export default function LoadingScreen({ childName, onComplete }: LoadingScreenPr
       const increment = 100 / (duration / 100); // 100msごとの進捗増加量
 
       progressTimer = setInterval(() => {
-        setProgress(prev => {
+        setProgress((prev) => {
           const next = prev + increment;
           return next > 100 ? 100 : next;
         });
@@ -74,7 +77,7 @@ export default function LoadingScreen({ childName, onComplete }: LoadingScreenPr
 
     // 豆知識を定期的に切り替え
     factTimer = setInterval(() => {
-      setCurrentFact(prev => (prev + 1) % funFacts.length);
+      setCurrentFact((prev) => (prev + 1) % funFacts.length);
     }, 5000);
 
     startStep(0);

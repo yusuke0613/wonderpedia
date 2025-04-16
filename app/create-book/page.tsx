@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -228,6 +228,7 @@ export default function CreateBookPage() {
   const [characterStep, setCharacterStep] = useState(0);
   const [characterAnswers, setCharacterAnswers] = useState<string[]>([]);
   const router = useRouter();
+  const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -252,7 +253,18 @@ export default function CreateBookPage() {
     };
 
     checkAuth();
-  }, [router]);
+
+    // クリーンアップ
+    return () => {
+      if (recognitionRef.current && isListening) {
+        try {
+          recognitionRef.current.stop();
+        } catch (e) {
+          console.error("音声認識の停止に失敗しました");
+        }
+      }
+    };
+  }, [router, isListening]);
 
   const toggleListening = () => {
     if (!isListening) {
@@ -264,24 +276,39 @@ export default function CreateBookPage() {
 
   const startListening = async () => {
     try {
+      if (typeof window === "undefined") return;
+
       const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition;
+        (window as any).SpeechRecognition ||
+        (window as any).webkitSpeechRecognition;
+
+      if (!SpeechRecognition) {
+        throw new Error("音声認識非対応");
+      }
+
       const recognition = new SpeechRecognition();
       recognition.lang = "ja-JP";
       recognition.continuous = true;
       recognition.interimResults = true;
 
-      recognition.onresult = (event: SpeechRecognitionEvent) => {
+      recognition.onresult = (event: any) => {
+        // 型アサーションを使って安全に処理
         const results = Array.from(event.results);
-        const transcripts = results.map((result) => {
-          const alternative = result.item(0);
-          return alternative.transcript;
-        });
-        const transcript = transcripts.join("");
-        setQuestion(transcript);
+        let finalTranscript = "";
+
+        for (let i = 0; i < results.length; i++) {
+          const result = results[i] as any;
+          if (result.isFinal) {
+            finalTranscript += result[0].transcript;
+          }
+        }
+
+        if (finalTranscript) {
+          setQuestion(finalTranscript);
+        }
       };
 
-      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+      recognition.onerror = (event: any) => {
         console.error("Speech recognition error", event.error);
         setIsListening(false);
       };
@@ -291,19 +318,23 @@ export default function CreateBookPage() {
       };
 
       recognition.start();
+      recognitionRef.current = recognition;
       setIsListening(true);
     } catch (err) {
-      console.error("Speech recognition not supported");
+      console.error("Speech recognition error:", err);
       setError("音声入力に対応していないブラウザです");
     }
   };
 
   const stopListening = () => {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.stop();
-    setIsListening(false);
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {
+        console.error("音声認識の停止に失敗しました");
+      }
+      setIsListening(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -329,7 +360,7 @@ export default function CreateBookPage() {
 
     try {
       // 実際のAI生成処理の代わりに、ローディング画面を表示
-      await new Promise((resolve) => setTimeout(resolve, 10000));
+      await new Promise((resolve) => setTimeout(resolve, 3000));
       router.push("/create-book/complete");
     } catch (err) {
       setError("絵本の生成に失敗しました");
